@@ -1,0 +1,17 @@
+{
+  "name": "class_preparation_2",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "class_preparation_2": "file:",
+    "cowsay": "^1.6.0"
+  }
+}

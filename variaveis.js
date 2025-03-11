@@ -7,3 +7,7 @@ console.log(idade);
 console.log(nome);
 console.log(pi);
 console.log(ativo);
+
+if (idade >= 18) {
+    console.log("Maior de idade");
+}

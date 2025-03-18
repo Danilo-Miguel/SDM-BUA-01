@@ -18,6 +18,16 @@ console.log(frutas);
 
 frutas.pop("Uva");
 console.log(frutas);
-frutas.shift();
 
 console.log(frutas);
+
+let mapa = new Map();
+
+mapa.set("nome", "João");
+mapa.set("idade", 18);
+mapa.set(1, true, "Sacanagem");
+
+//acessando valores
+
+console.log(mapa.get("nome"));
+console.log(mapa.get(1));

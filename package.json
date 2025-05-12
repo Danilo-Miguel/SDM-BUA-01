@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Danilo-Miguel/SDM-BUA-01#readme",
   "dependencies": {
     "express": "^4.21.2",
-    "sdm-bua-01": "file:"
+    "sdm-bua-01": "file:",
+    "socket.io": "^4.8.1"
   }
 }

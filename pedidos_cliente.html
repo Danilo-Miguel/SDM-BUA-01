@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Painel da Cozinha</title>
+
+  <!-- Carrega a biblioteca Socket.IO do CDN.
+       Essa biblioteca permite que o navegador se conecte ao servidor WebSocket -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <!-- Título da página -->
+  <h1>Pedidos Novos:</h1>
+
+  <!-- Lista onde os pedidos recebidos em tempo real serão inseridos -->
+  <ul id="lista-pedidos"></ul>
+
+  <script>
+    // Cria uma conexão WebSocket com o servidor localizado em http://localhost:3000
+    const socket = io("http://localhost:3000");
+
+    // Evento disparado quando a conexão WebSocket é bem-sucedida
+    socket.on("connect", () => {
+      // Exibe o ID único da conexão WebSocket no console do navegador
+      console.log("Conectado com ID:", socket.id);
+    });
+
+    // Escuta o evento "novo_pedido" enviado pelo servidor
+    socket.on("novo_pedido", (pedido) => {
+      // Cria um novo elemento <li> (linha da lista)
+      const li = document.createElement("li");
+
+      // Define o conteúdo do <li> com os dados do pedido (mesa + itens)
+      li.textContent = `Mesa ${pedido.mesa}: ${pedido.itens.join(", ")}`;
+
+      // Adiciona o <li> dentro da <ul> com id "lista-pedidos"
+      document.getElementById("lista-pedidos").appendChild(li);
+    });
+  </script>
+</body>
+</html>

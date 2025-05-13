@@ -1,71 +1,71 @@
-const express = require('express');  // Importa express
-const http = require('http'); // Importa http
-const cors = require('cors'); // Importa cors
-const socktetIo = require('socket.io'); // Importa socket.io
 
-// Crea una instancia de express
+// Importa as bibliotecas necessárias
+const express = require("express");  // Express para gerenciamento da API
+const http = require("http");      // Para criar o servidor HTTP
+const cors = require("cors");      // Middleware para CORS
+const socketIo = require("socket.io");  // Socket.IO para comunicação em tempo real
+
+// Cria uma instância do app Express
 const app = express();
-// Crea una instancia de http
+
+// Cria o servidor HTTP, passando o app Express como parâmetro
 const server = http.createServer(app);
 
+// Aplica o CORS para permitir que o frontend acesse a API
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Middleware para processar requisições com corpo JSON
 
-const io = socktetIo(server, {  
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-    },
-    });
+// Configura o Socket.IO no servidor
+const io = socketIo(server, {
+  cors: {
+    origin: "*",          // Permite que qualquer origem faça requisições. Em produção, especifique origens permitidas.
+    methods: ["GET", "POST"]  // Métodos permitidos para comunicação
+  }
+});
 
-    let usuarios = []; 
-    let pedidos= [];
+// Banco de dados em memória (simulando um banco)
+let usuarios = [];
+let pedidos = [];
 
-      // Quando o cliente se conecta
-    io.on('connection', (socket) => { // Escuta a conexão de um cliente
-        console.log('Cliente conectado via websocket'); 
+// Quando um cliente se conecta via WebSocket
+io.on("connection", (socket) => {
+  console.log("Cliente conectado via WebSocket:", socket.id);
 
-      // Quando o cliente se desconecta
-        socket.on('disconnect', () => { // 
-            console.log('Cliente desconectado'); // consola
-        });
+  // Quando o cliente se desconecta
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado:", socket.id);
+  });
+});
 
-        socket.on("pedido_pronto", (data) => { // Escuta o evento 'pedido_pronto'
-            console.log(`Pedido ${data.id} pronto`); // console
+// Rota para cadastrar novo usuário
+app.post("/usuarios", (req, res) => {
+  const usuario = req.body;  // Obtém os dados do usuário enviados no corpo da requisição
+  usuarios.push(usuario);    // Adiciona o usuário ao banco de dados em memória
 
-        });
-    });
+  // Emite um evento WebSocket para notificar todos os clientes sobre o novo usuário
+  io.emit("novo_usuario", usuario);
 
-        // Rota para cadastra novo usuario
-        app.post('/usuario', (req, res) => { // Rota para cadastrar um novo usuario
-            const usuario = req.body; // Pega o nome do usuario do corpo da requisição
-            usuarios.push(usuario); // Adiciona o usuario ao array de usuarios
-           
-            io.emit('novo usuário', usuario); // Emite o evento 'usuarios' para todos os clientes conectados
+  res.send({ message: "Usuário cadastrado!", usuario });
+});
 
-            res.status(200).json({ message: 'Usuario cadastrado com sucesso' }); // Retorna uma resposta de sucesso
-        });
+// Rota para criar pedido
+app.post("/pedidos", (req, res) => {
+  const pedido = req.body;  // Obtém os dados do pedido enviados no corpo da requisição
+  pedidos.push(pedido);     // Adiciona o pedido ao banco de dados em memória
 
-             // Rota para cadastrar novo pedido
-        app.post('/pedidos', (req, res) => { // Rota para cadastrar um novo pedido
-            const pedido = req.body; // Pega o nome do pedido do corpo da requisição
-            pedido.id = Date.now(); // Adiciona um id único ao pedido   
+  // Emite um evento WebSocket para notificar todos os clientes sobre o novo pedido
+  io.emit("novo_pedido", pedido);
 
-            pedidos.push(pedido); // Adiciona o pedido ao array de pedidos
-           
-            io.emit('novo pedido', pedido); // Emite o evento 'usuarios' para todos os clientes conectados
+  res.send({ message: "Pedido criado!", pedido });
+});
 
-            res.status(200).json({ message: 'Pedido cadastrado com sucesso' }); // Retorna uma resposta de sucesso
-        });
+// Rota para consultar dados (apenas para debug)
+app.get("/dados", (req, res) => {
+  res.send({ usuarios, pedidos });
+});
 
-        app.get('/dados', (req, res) => { // Rota para pegar todos os pedidos
-            res.status(200).json(pedidos, usuarios); // Retorna todos os pedidos
-        });
-    
-        // Inicia o servidor na porta 3000
-        server.listen(3000, () => { // Inicia o servidor na porta 3000
-            console.log('Servidor rodando na porta 3000'); // console
-        });
-       
-    
+// Inicia o servidor HTTP na porta 3000
+server.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000 com WebSocket");
+});
 

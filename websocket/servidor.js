@@ -30,7 +30,11 @@ const io = socktetIo(server, {
             console.log('Cliente desconectado'); // consola
         });
 
+        socket.on("pedido_pronto", (data) => { // Escuta o evento 'pedido_pronto'
+            console.log(`Pedido ${data.id} pronto`); // console
+
         });
+    });
 
         // Rota para cadastra novo usuario
         app.post('/usuario', (req, res) => { // Rota para cadastrar um novo usuario
@@ -45,6 +49,8 @@ const io = socktetIo(server, {
              // Rota para cadastrar novo pedido
         app.post('/pedidos', (req, res) => { // Rota para cadastrar um novo pedido
             const pedido = req.body; // Pega o nome do pedido do corpo da requisição
+            pedido.id = Date.now(); // Adiciona um id único ao pedido   
+
             pedidos.push(pedido); // Adiciona o pedido ao array de pedidos
            
             io.emit('novo pedido', pedido); // Emite o evento 'usuarios' para todos os clientes conectados

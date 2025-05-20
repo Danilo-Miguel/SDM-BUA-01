@@ -5,7 +5,6 @@ const app = express();
 app.use(express.json());
 
 // Conexão com MongoDB Atlas
-// const mongoUri = "mongodb+srv://profdanilomiguel:usjt*20251@usjt.tz3jhkm.mongodb.net/?retryWrites=true&w=majority&appName=usjt";
 const mongoUri = "mongodb+srv://profdanilomiguel:usjt*20251@usjt.tz3jhkm.mongodb.net/mongo-microsservices?retryWrites=true&w=majority&appName=usjt";
 
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -15,8 +14,8 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
 // Schema para pedidos
 const orderSchema = new mongoose.Schema({
   userId: String,
-  produto: String,         // novo campo adicionado: nome do produto
-  quantidade: Number,      // novo campo adicionado: quantidade do produto
+  produto: String,
+  quantidade: Number,
   status: { type: String, default: "pendente" },
   createdAt: { type: Date, default: Date.now },
 });
@@ -26,14 +25,55 @@ const Order = mongoose.model("Order", orderSchema);
 // Rota para processar um pedido
 app.post("/pedidos", async (req, res) => {
   try {
-    const pedido = req.body;                    // Recebe o JSON com os dados do pedido
-    const novoPedido = new Order(pedido);       // Cria um novo pedido com base no schema
-    await novoPedido.save();                    // Salva no MongoDB
+    const pedido = req.body;
+    const novoPedido = new Order(pedido);
+    await novoPedido.save();
 
-    console.log("Pedido recebido:", novoPedido); // Log no terminal para depuração
+    console.log("Pedido recebido:", novoPedido);
     res.send({ message: "Pedido processado!", pedido: novoPedido });
   } catch (error) {
     res.status(500).send({ error: "Erro ao processar pedido" });
+  }
+});
+
+// 🔍 Rota para listar todos os pedidos
+app.get("/pedidos", async (req, res) => {
+  try {
+    const pedidos = await Order.find();
+    console.log("Pedidos cadastrados:", pedidos); // Exibe no console
+    res.send(pedidos);
+  } catch (error) {
+    res.status(500).send({ error: "Erro ao buscar pedidos" });
+  }
+});
+
+// ✏️ Rota para atualizar pedido por ID do documento (_id do MongoDB)
+app.put("/pedidos/:id", async (req, res) => {
+  try {
+    const pedidoAtualizado = await Order.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!pedidoAtualizado) {
+      return res.status(404).send({ error: "Pedido não encontrado" });
+    }
+    res.send({ message: "Pedido atualizado", pedido: pedidoAtualizado });
+  } catch (error) {
+    res.status(500).send({ error: "Erro ao atualizar pedido" });
+  }
+});
+
+// 🗑️ Rota para deletar pedido por ID do documento (_id do MongoDB)
+app.delete("/pedidos/:id", async (req, res) => {
+  try {
+    const resultado = await Order.findByIdAndDelete(req.params.id);
+    if (!resultado) {
+      return res.status(404).send({ error: "Pedido não encontrado" });
+    }
+    res.send({ message: "Pedido removido" });
+  } catch (error) {
+    res.status(500).send({ error: "Erro ao remover pedido" });
   }
 });
 

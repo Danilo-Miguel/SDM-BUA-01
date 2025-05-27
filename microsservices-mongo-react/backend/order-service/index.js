@@ -1,7 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");  // Importa o CORS
 
 const app = express();
+
+
+// Habilita CORS para localhost:3000 (frontend React)
+app.use(cors({ origin: "http://localhost:3000" }));
+
 app.use(express.json());
 
 // Conexão com MongoDB Atlas

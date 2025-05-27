@@ -1,8 +1,13 @@
 const express = require("express");
 const axios = require("axios");
 const mongoose = require("mongoose");
+const cors = require("cors");  // Importa o CORS
 
 const app = express();
+
+// Habilita CORS para localhost:3000 (frontend React)
+app.use(cors({ origin: "http://localhost:3000" }));
+
 app.use(express.json());
 
 // Conexão com MongoDB Atlas
@@ -44,7 +49,7 @@ app.post("/usuarios", async (req, res) => {
   }
 });
 
-// 🔍 Rota para listar todos os usuários
+// Rota para listar todos os usuários
 app.get("/usuarios", async (req, res) => {
   try {
     const usuarios = await User.find();
@@ -55,7 +60,7 @@ app.get("/usuarios", async (req, res) => {
   }
 });
 
-// ✏️ Rota para atualizar usuário por ID
+// Rota para atualizar usuário por ID
 app.put("/usuarios/:id", async (req, res) => {
   try {
     const usuarioAtualizado = await User.findOneAndUpdate(
@@ -72,7 +77,7 @@ app.put("/usuarios/:id", async (req, res) => {
   }
 });
 
-// 🗑️ Rota para deletar usuário por ID
+// Rota para deletar usuário por ID
 app.delete("/usuarios/:id", async (req, res) => {
   try {
     const resultado = await User.findOneAndDelete({ id: req.params.id });
@@ -85,4 +90,4 @@ app.delete("/usuarios/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("User-Service rodando na porta 3000"));
+app.listen(3002, () => console.log("User-Service rodando na porta 3002"));
